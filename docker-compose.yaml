@@ -1,0 +1,46 @@
+---
+version: '3.7'
+services:
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    labels:
+      - homepage.group={{ HOMEPAGE_GROUP }}
+      - homepage.name=AdGuard
+      - homepage.icon=adguard-home
+      - homepage.href={{ HOMEPAGE_HREF }}
+      - homepage.description=Ad & Tracker Blocking DNS
+      - homepage.weight={{ HOMEPAGE_WEIGHT }}
+      - homepage.widget.type=adguard
+      - homepage.widget.url={{ HOMEPAGE_HREF }}
+    ports:
+      - {{ HOST_IP }}:53:53/tcp
+      - {{ HOST_IP }}:53:53/udp
+      - 784:784/udp
+      - 853:853/tcp
+      - 3000:3000/tcp
+      - 80:80/tcp
+      - 443:443/tcp
+    volumes:
+      - type: volume
+        source: adguard-work
+        target: /opt/adguardhome/work
+        volume:
+          nocopy: true
+      - type: volume
+        source: adguard-conf
+        target: /opt/adguardhome/conf
+        volume:
+          nocopy: true
+
+volumes:
+  adguard-conf:
+    driver_opts:
+      type: "nfs"
+      o: "addr={{ NFS_SERVER }},nolock,soft,rw"
+      device: ":{{ NFS_VOLUME_PATH }}"
+  adguard-work:
+    driver_opts:
+      type: "nfs"
+      o: "addr={{ NFS_SERVER}},nolock,soft,rw"
+      device: ":{{ NFS_VOLUME_PATH }}"
